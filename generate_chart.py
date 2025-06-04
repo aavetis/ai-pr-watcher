@@ -253,25 +253,25 @@ def generate_chart(csv_file=None):
         if cop_total > 0:
             ax1.text(i - 1.5*width, cop_total + 0.5, str(int(cop_total)), ha='center', va='bottom', fontsize=7, color='#4682B4')
         if cop_merged > 0:
-            ax1.text(i - 1.5*width, cop_merged/2, str(int(cop_merged)), ha='center', va='center', fontsize=7, color='white', fontweight='bold')
+            ax1.text(i - 1.5*width, cop_merged/2, str(int(cop_merged)), ha='center', va='center', fontsize=7, color='black', fontweight='bold')
         
         # Codex bars  
         if cod_total > 0:
             ax1.text(i - 0.5*width, cod_total + 0.5, str(int(cod_total)), ha='center', va='bottom', fontsize=7, color='#CD5C5C')
         if cod_merged > 0:
-            ax1.text(i - 0.5*width, cod_merged/2, str(int(cod_merged)), ha='center', va='center', fontsize=7, color='white', fontweight='bold')
+            ax1.text(i - 0.5*width, cod_merged/2, str(int(cod_merged)), ha='center', va='center', fontsize=7, color='black', fontweight='bold')
         
         # Cursor bars
         if cur_total > 0:
             ax1.text(i + 0.5*width, cur_total + 0.5, str(int(cur_total)), ha='center', va='bottom', fontsize=7, color='#9370DB')
         if cur_merged > 0:
-            ax1.text(i + 0.5*width, cur_merged/2, str(int(cur_merged)), ha='center', va='center', fontsize=7, color='white', fontweight='bold')
+            ax1.text(i + 0.5*width, cur_merged/2, str(int(cur_merged)), ha='center', va='center', fontsize=7, color='black', fontweight='bold')
         
         # Devin bars
         if dev_total > 0:
             ax1.text(i + 1.5*width, dev_total + 0.5, str(int(dev_total)), ha='center', va='bottom', fontsize=7, color='#228B22')
         if dev_merged > 0:
-            ax1.text(i + 1.5*width, dev_merged/2, str(int(dev_merged)), ha='center', va='center', fontsize=7, color='white', fontweight='bold')
+            ax1.text(i + 1.5*width, dev_merged/2, str(int(dev_merged)), ha='center', va='center', fontsize=7, color='black', fontweight='bold')
 
     # Add percentage labels on line points (with smart positioning and 0.0% filtering)
     for i, (cop_pct, cod_pct, cur_pct, dev_pct) in enumerate(
