@@ -234,9 +234,9 @@ def generate_chart(csv_file=None):
     ax1.set_xticks(x)
     ax1.set_xticklabels(timestamps, rotation=45)
 
-    # Add legends - moved outside plot area to reduce clutter
-    legend1 = ax1.legend(loc="center left", bbox_to_anchor=(1.02, 0.7))
-    legend2 = ax2.legend(loc="center left", bbox_to_anchor=(1.02, 0.3))
+    # Add legends - moved to bottom right with extra padding to avoid overlap
+    legend1 = ax1.legend(loc="upper right", bbox_to_anchor=(1.15, 0.35))
+    legend2 = ax2.legend(loc="upper right", bbox_to_anchor=(1.15, 0.15))
 
     # Add grid
     ax1.grid(True, alpha=0.3, linestyle="--")
@@ -304,15 +304,11 @@ def generate_chart(csv_file=None):
     # Save chart with appropriate DPI for CI environments
     chart_file = Path("chart.png")
     dpi = 150 if num_points <= 5 else 300
-    fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white", pad_inches=0.2)
+    fig.savefig(chart_file, dpi=dpi, bbox_inches="tight", facecolor="white", pad_inches=0.3)
     print(f"Chart generated: {chart_file}")
     
-    # Also save chart to docs directory for GitHub Pages
-    docs_dir = Path("docs")
-    if docs_dir.exists():
-        docs_chart_file = docs_dir / "chart.png"
-        fig.savefig(docs_chart_file, dpi=dpi, bbox_inches="tight", facecolor="white", pad_inches=0.2)
-        print(f"Chart copied to GitHub Pages: {docs_chart_file}")
+    # Note: Chart is saved only in root directory to avoid duplication
+    # Both README.md and GitHub Pages will reference the same file
 
     # Update the README with latest statistics
     update_readme(df)
