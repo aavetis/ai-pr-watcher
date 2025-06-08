@@ -17,20 +17,32 @@ Explore the GitHub search queries used:
 
 ## Testing
 
-Run simple tests to verify core functionality:
+Run comprehensive tests to verify the complete data flow works properly:
 
 ```bash
 python test_pr_tracker.py
 ```
 
-The test verifies:
-- Required files exist (collect_data.py, generate_chart.py, README.md)
-- CSV operations work correctly
-- Data collection module imports and has required functions
-- Chart generation module is available (when dependencies installed)
-- Basic data processing works with existing data
+The tests verify the critical data flow capabilities:
 
-This simple test helps ensure that core functionality works after any code changes.
+**Core Data Collection:**
+- Data collection from GitHub API with proper CSV storage
+- Handling of API responses and error cases
+
+**README Updates:**  
+- Markdown table updates with latest metrics
+- Percentage calculations including edge cases (zero division)
+
+**Chart Generation:**
+- Chart creation and PNG file generation 
+- Data visualization processing
+
+**GitHub Pages Updates:**
+- JSON metrics export for interactive charts
+- HTML table updates with latest statistics
+- Timestamp updates for last refresh
+
+These tests ensure that data flows properly through the entire system: Collection → CSV → Chart → README → GitHub Pages. The tests use temporary files and mock API calls to avoid side effects while testing the actual data processing logic.
 
 ---
 
