@@ -15,6 +15,28 @@ Explore the GitHub search queries used:
 - **All Devin PRs**: [author:devin-ai-integration[bot]](https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests)
 - **Merged Devin PRs**: [author:devin-ai-integration[bot] is:merged](https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests)
 
+## Testing
+
+Run unit tests to verify core functionality:
+
+```bash
+python test_pr_tracker.py
+```
+
+Or use Python's unittest module:
+
+```bash
+python -m unittest test_pr_tracker.TestPRTracker -v
+```
+
+The tests cover:
+- Data collection logic (with mocked API responses)
+- README updating capability
+- Chart generation and image creation
+- GitHub Pages interactive table updates
+- JSON data export for charts
+- Edge case handling (empty data, missing files, zero divisions)
+
 ---
 
 ![chart](docs/chart.png)
