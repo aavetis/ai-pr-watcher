@@ -17,25 +17,20 @@ Explore the GitHub search queries used:
 
 ## Testing
 
-Run unit tests to verify core functionality:
+Run simple tests to verify core functionality:
 
 ```bash
 python test_pr_tracker.py
 ```
 
-Or use Python's unittest module:
+The test verifies:
+- Required files exist (collect_data.py, generate_chart.py, README.md)
+- CSV operations work correctly
+- Data collection module imports and has required functions
+- Chart generation module is available (when dependencies installed)
+- Basic data processing works with existing data
 
-```bash
-python -m unittest test_pr_tracker.TestPRTracker -v
-```
-
-The tests cover:
-- Data collection logic (with mocked API responses)
-- README updating capability
-- Chart generation and image creation
-- GitHub Pages interactive table updates
-- JSON data export for charts
-- Edge case handling (empty data, missing files, zero divisions)
+This simple test helps ensure that core functionality works after any code changes.
 
 ---
 
