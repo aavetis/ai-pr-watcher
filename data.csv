@@ -1,4 +1,4 @@
-timestamp,copilot_total,copilot_merged,codex_total,codex_merged,cursor_total,cursor_merged,devin_total,devin_merged,codegen_total,codegen_merged,claude_total,claude_merged
+timestamp,claude_total,claude_merged,copilot_total,copilot_merged,codex_total,codex_merged,cursor_total,cursor_merged,devin_total,devin_merged,codegen_total,codegen_merged
 2025‑05‑26 14:21:34,8729,1594,54211,44230,0,0,0,0,0,0,0,0
 2025‑05‑26 14:41:16,8772,1600,54285,44297,0,0,0,0,0,0,0,0
 2025‑05‑26 14:44:33,8773,1604,54300,44309,0,0,0,0,0,0,0,0

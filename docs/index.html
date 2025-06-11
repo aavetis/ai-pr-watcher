@@ -222,6 +222,43 @@
                 <span id="codegen-rate">{{CODEGEN_RATE}}</span>
               </td>
             </tr>
+            <tr data-agent="claude">
+              <td class="agent-cell">
+                <div class="agent-info">
+                  <span
+                    class="agent-icon"
+                    style="background-color: #f39c12"
+                  ></span>
+                  <a
+                    href="https://claude.ai"
+                    target="_blank"
+                    class="agent-link"
+                    >Claude</a
+                  >
+                </div>
+              </td>
+              <td class="metric-cell">
+                <a
+                  href="https://github.com/search?q=co-authored-by%3A%22Claude%22&type=pullrequests"
+                  target="_blank"
+                  class="metric-link"
+                >
+                  <span id="claude-total">{{CLAUDE_TOTAL}}</span>
+                </a>
+              </td>
+              <td class="metric-cell">
+                <a
+                  href="https://github.com/search?q=co-authored-by%3A%22Claude%22+is%3Amerged&type=pullrequests"
+                  target="_blank"
+                  class="metric-link"
+                >
+                  <span id="claude-merged">{{CLAUDE_MERGED}}</span>
+                </a>
+              </td>
+              <td class="rate-cell">
+                <span id="claude-rate">{{CLAUDE_RATE}}</span>
+              </td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -287,6 +324,17 @@
                     style="background-color: #daa520"
                   ></span
                   >Codegen
+                </button>
+                <button
+                  id="toggleClaude"
+                  class="toggle-btn active"
+                  data-agent="claude"
+                >
+                  <span
+                    class="toggle-icon"
+                    style="background-color: #f39c12"
+                  ></span
+                  >Claude
                 </button>
               </div>
             </div>
@@ -454,7 +502,7 @@
         // Get the latest data point (last index)
         const latestIndex = chartData.labels.length - 1;
 
-        const agents = ["copilot", "codex", "cursor", "devin", "codegen"];
+        const agents = ["copilot", "codex", "cursor", "devin", "codegen", "claude"];
 
         agents.forEach((agent) => {
           // Find datasets for this agent
@@ -554,7 +602,7 @@
               // Get the agent name from the dataset label
               const agentMatch = dataset.label
                 .toLowerCase()
-                .match(/(copilot|codex|cursor|devin|codegen)/);
+                .match(/(copilot|codex|cursor|devin|codegen|claude)/);
               const agent = agentMatch ? agentMatch[1] : null;
 
               // Check if agent is currently enabled
