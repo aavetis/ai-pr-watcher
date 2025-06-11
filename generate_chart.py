@@ -45,6 +45,14 @@ def generate_chart(csv_file=None):
         print(f"Limited chart to 8 data points evenly distributed across {total_points} total points.")
 
     # Calculate percentages with safety checks
+    df["claude_percentage"] = df.apply(
+        lambda row: (
+            (row["claude_merged"] / row["claude_total"] * 100)
+            if row["claude_total"] > 0
+            else 0
+        ),
+        axis=1,
+    )
     df["copilot_percentage"] = df.apply(
         lambda row: (
             (row["copilot_merged"] / row["copilot_total"] * 100)
@@ -101,12 +109,29 @@ def generate_chart(csv_file=None):
 
     # Prepare data
     x = np.arange(len(df))
-    # Adjust bar width based on number of data points (5 groups now)
-    width = min(0.16, 0.8 / max(1, num_points * 0.6))
+    # Adjust bar width based on number of data points (6 groups now)
+    width = min(0.13, 0.8 / max(1, num_points * 0.6))
 
     # Bar charts for totals and merged
+    bars_claude_total = ax1.bar(
+        x - 2.5*width,
+        df["claude_total"],
+        width,
+        label="Claude Total",
+        alpha=0.7,
+        color="#FFB6C1",
+    )
+    bars_claude_merged = ax1.bar(
+        x - 2.5*width,
+        df["claude_merged"],
+        width,
+        label="Claude Merged",
+        alpha=1.0,
+        color="#FF69B4",
+    )
+
     bars_copilot_total = ax1.bar(
-        x - 2*width,
+        x - 1.5*width,
         df["copilot_total"],
         width,
         label="Copilot Total",
@@ -114,7 +139,7 @@ def generate_chart(csv_file=None):
         color="#87CEEB",
     )
     bars_copilot_merged = ax1.bar(
-        x - 2*width,
+        x - 1.5*width,
         df["copilot_merged"],
         width,
         label="Copilot Merged",
@@ -123,7 +148,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codex_total = ax1.bar(
-        x - 1*width,
+        x - 0.5*width,
         df["codex_total"],
         width,
         label="Codex Total",
@@ -131,7 +156,7 @@ def generate_chart(csv_file=None):
         color="#FFA07A",
     )
     bars_codex_merged = ax1.bar(
-        x - 1*width,
+        x - 0.5*width,
         df["codex_merged"],
         width,
         label="Codex Merged",
@@ -140,7 +165,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_cursor_total = ax1.bar(
-        x + 0*width,
+        x + 0.5*width,
         df["cursor_total"],
         width,
         label="Cursor Total",
@@ -148,7 +173,7 @@ def generate_chart(csv_file=None):
         color="#DDA0DD",
     )
     bars_cursor_merged = ax1.bar(
-        x + 0*width,
+        x + 0.5*width,
         df["cursor_merged"],
         width,
         label="Cursor Merged",
@@ -157,7 +182,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_devin_total = ax1.bar(
-        x + 1*width,
+        x + 1.5*width,
         df["devin_total"],
         width,
         label="Devin Total",
@@ -165,7 +190,7 @@ def generate_chart(csv_file=None):
         color="#98FB98",
     )
     bars_devin_merged = ax1.bar(
-        x + 1*width,
+        x + 1.5*width,
         df["devin_merged"],
         width,
         label="Devin Merged",
@@ -174,7 +199,7 @@ def generate_chart(csv_file=None):
     )
 
     bars_codegen_total = ax1.bar(
-        x + 2*width,
+        x + 2.5*width,
         df["codegen_total"],
         width,
         label="Codegen Total",
@@ -182,7 +207,7 @@ def generate_chart(csv_file=None):
         color="#FFE4B5",
     )
     bars_codegen_merged = ax1.bar(
-        x + 2*width,
+        x + 2.5*width,
         df["codegen_merged"],
         width,
         label="Codegen Merged",
@@ -191,6 +216,19 @@ def generate_chart(csv_file=None):
     )
 
     # Line charts for percentages (on secondary y-axis)
+    line_claude = ax2.plot(
+        x,
+        df["claude_percentage"],
+        "*-",
+        color="#C71585",
+        linewidth=3,
+        markersize=10,
+        label="Claude Success %",
+        markerfacecolor="white",
+        markeredgewidth=2,
+        markeredgecolor="#C71585",
+    )
+
     line_copilot = ax2.plot(
         x,
         df["copilot_percentage"],
@@ -308,6 +346,8 @@ def generate_chart(csv_file=None):
                     color="black",
                 )
 
+    add_value_labels(ax1, bars_claude_total)
+    add_value_labels(ax1, bars_claude_merged)
     add_value_labels(ax1, bars_copilot_total)
     add_value_labels(ax1, bars_copilot_merged)
     add_value_labels(ax1, bars_codex_total)
@@ -320,11 +360,22 @@ def generate_chart(csv_file=None):
     add_value_labels(ax1, bars_codegen_merged)
 
     # Add percentage labels on line points (with validation and skip 0.0%)
-    for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
-        zip(df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"], df["codegen_percentage"])
+    for i, (cl_pct, cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
+        zip(df["claude_percentage"], df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"], df["codegen_percentage"])
     ):
         # Only add labels if percentages are valid numbers and not 0.0%
-        if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct) and pd.notna(cg_pct):
+        if pd.notna(cl_pct) and pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct) and pd.notna(cg_pct):
+            if cl_pct > 0.0:
+                ax2.annotate(
+                    f"{cl_pct:.1f}%",
+                    (i, cl_pct),
+                    textcoords="offset points",
+                    xytext=(0, 30),
+                    ha="center",
+                    fontsize=10,
+                    fontweight="bold",
+                    color="#C71585",
+                )
             if cop_pct > 0.0:
                 ax2.annotate(
                     f"{cop_pct:.1f}%",
@@ -426,6 +477,7 @@ def export_chart_data_json(df):
     
     # Color scheme matching the Python chart
     colors = {
+        "claude": {"total": "#FFB6C1", "merged": "#FF69B4", "line": "#C71585"},
         "copilot": {"total": "#87CEEB", "merged": "#4682B4", "line": "#000080"},
         "codex": {"total": "#FFA07A", "merged": "#CD5C5C", "line": "#8B0000"},
         "cursor": {"total": "#DDA0DD", "merged": "#9370DB", "line": "#800080"},
@@ -434,7 +486,7 @@ def export_chart_data_json(df):
     }
     
     # Add bar datasets for totals and merged PRs
-    for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+    for agent in ["claude", "copilot", "codex", "cursor", "devin", "codegen"]:
         # Process data to replace leading zeros with None (null in JSON)
         total_data = df[f"{agent}_total"].tolist()
         merged_data = df[f"{agent}_merged"].tolist()
@@ -515,6 +567,7 @@ def update_readme(df):
     latest = df.iloc[-1]
 
     # Calculate merge rates
+    claude_rate = latest.claude_merged / latest.claude_total * 100 if latest.claude_total > 0 else 0
     copilot_rate = latest.copilot_merged / latest.copilot_total * 100
     codex_rate = latest.codex_merged / latest.codex_total * 100
     cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
@@ -522,6 +575,8 @@ def update_readme(df):
     codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
 
     # Format numbers with commas
+    claude_total = f"{latest.claude_total:,}"
+    claude_merged = f"{latest.claude_merged:,}"
     copilot_total = f"{latest.copilot_total:,}"
     copilot_merged = f"{latest.copilot_merged:,}"
     codex_total = f"{latest.codex_total:,}"
@@ -538,6 +593,7 @@ def update_readme(df):
 
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
+| Claude  | {claude_total} | {claude_merged} | {claude_rate:.2f}% |
 | Copilot | {copilot_total} | {copilot_merged} | {copilot_rate:.2f}% |
 | Codex   | {codex_total} | {codex_merged} | {codex_rate:.2f}% |
 | Cursor  | {cursor_total} | {cursor_merged} | {cursor_rate:.2f}% |
@@ -573,6 +629,7 @@ def update_github_pages(df):
     latest = df.iloc[-1]
     
     # Calculate merge rates
+    claude_rate = latest.claude_merged / latest.claude_total * 100 if latest.claude_total > 0 else 0
     copilot_rate = latest.copilot_merged / latest.copilot_total * 100
     codex_rate = latest.codex_merged / latest.codex_total * 100
     cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
@@ -580,6 +637,8 @@ def update_github_pages(df):
     codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
 
     # Format numbers with commas
+    claude_total = f"{latest.claude_total:,}"
+    claude_merged = f"{latest.claude_merged:,}"
     copilot_total = f"{latest.copilot_total:,}"
     copilot_merged = f"{latest.copilot_merged:,}"
     codex_total = f"{latest.codex_total:,}"
@@ -598,6 +657,12 @@ def update_github_pages(df):
     index_content = index_path.read_text()
     
     # Update the table data
+    index_content = re.sub(
+        r'<td>Claude</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
+        f'<td>Claude</td>\n                        <td>{claude_total}</td>\n                        <td>{claude_merged}</td>\n                        <td>{claude_rate:.2f}%</td>',
+        index_content
+    )
+    
     index_content = re.sub(
         r'<td>Copilot</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
         f'<td>Copilot</td>\n                        <td>{copilot_total}</td>\n                        <td>{copilot_merged}</td>\n                        <td>{copilot_rate:.2f}%</td>',
