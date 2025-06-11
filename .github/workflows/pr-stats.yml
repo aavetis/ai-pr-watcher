@@ -20,6 +20,8 @@ jobs:
       - run: pip install --quiet matplotlib pandas requests numpy
 
       - name: Collect PR data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python collect_data.py
 
       - name: Generate chart

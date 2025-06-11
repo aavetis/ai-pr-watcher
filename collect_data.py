@@ -8,12 +8,23 @@ import datetime as dt
 import re
 from pathlib import Path
 import requests
+import os
 
+# Fetch the GitHub token from environment variables
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+if not GITHUB_TOKEN:
+    raise ValueError("GITHUB_TOKEN is not set in environment variables")
 # Basic headers for GitHub public API
-HEADERS = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
+HEADERS = {
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "PR-Watcher",
+    "Authorization": f"token {GITHUB_TOKEN}",
+}
 
 # Search queries - tracking merged PRs
 Q = {
+    "is:pr+head:claude/": "claude_total",
+    "is:pr+head:claude/+is:merged": "claude_merged",
     "is:pr+head:copilot/": "copilot_total",
     "is:pr+head:copilot/+is:merged": "copilot_merged",
     "is:pr+head:codex/": "codex_total",
@@ -43,6 +54,8 @@ def collect_data():
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
     row = [
         timestamp,
+        cnt["claude_total"],
+        cnt["claude_merged"],
         cnt["copilot_total"],
         cnt["copilot_merged"],
         cnt["codex_total"],
@@ -63,6 +76,8 @@ def collect_data():
             writer.writerow(
                 [
                     "timestamp",
+                    "claude_total",
+                    "claude_merged",
                     "copilot_total",
                     "copilot_merged",
                     "codex_total",

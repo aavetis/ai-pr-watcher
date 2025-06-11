@@ -6,6 +6,8 @@ View the [interactive dashboard](https://aavetis.github.io/ai-pr-watcher/) for t
 
 Explore the GitHub search queries used:
 
+- **All Claude PRs**: [is:pr head:claude/](https://github.com/search?q=is:pr+head:claude/&type=pullrequests)
+- **Merged Claude PRs**: [is:pr head:claude/ is:merged](https://github.com/search?q=is:pr+head:claude/+is:merged&type=pullrequests)
 - **All Copilot PRs**: [is:pr head:copilot/](https://github.com/search?q=is:pr+head:copilot/&type=pullrequests)
 - **Merged Copilot PRs**: [is:pr head:copilot/ is:merged](https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests)
 - **All Codex PRs**: [is:pr head:codex/](https://github.com/search?q=is:pr+head:codex/&type=pullrequests)
@@ -25,6 +27,7 @@ Explore the GitHub search queries used:
 
 | Project | Total PRs | Merged PRs | Merge Rate |
 | ------- | --------- | ---------- | ---------- |
+| Claude  | 3,939 | 1,640 | 41.63% |
 | Copilot | 15,284 | 6,425 | 42.04% |
 | Codex   | 257,837 | 216,098 | 83.81% |
 | Cursor  | 927 | 697 | 75.19% |
