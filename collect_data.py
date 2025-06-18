@@ -14,16 +14,16 @@ HEADERS = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
 
 # Search queries - tracking merged PRs
 Q = {
-    "is:pr+head:copilot/": "copilot_total",
-    "is:pr+head:copilot/+is:merged": "copilot_merged",
-    "is:pr+head:codex/": "codex_total",
-    "is:pr+head:codex/+is:merged": "codex_merged",
-    "is:pr+head:cursor/": "cursor_total",
-    "is:pr+head:cursor/+is:merged": "cursor_merged",
-    "author:devin-ai-integration[bot]": "devin_total",
-    "author:devin-ai-integration[bot]+is:merged": "devin_merged",
-    "author:codegen-sh[bot]": "codegen_total",
-    "author:codegen-sh[bot]+is:merged": "codegen_merged",
+    "language:cpp+is:pr+head:copilot/": "copilot_total",
+    "language:cpp+is:pr+head:copilot/+is:merged": "copilot_merged",
+    "language:cpp+is:pr+head:codex/": "codex_total",
+    "language:cpp+is:pr+head:codex/+is:merged": "codex_merged",
+    "language:cpp+is:pr+head:cursor/": "cursor_total",
+    "language:cpp+is:pr+head:cursor/+is:merged": "cursor_merged",
+    "language:cpp+author:devin-ai-integration[bot]": "devin_total",
+    "language:cpp+author:devin-ai-integration[bot]+is:merged": "devin_merged",
+    "language:cpp+author:codegen-sh[bot]": "codegen_total",
+    "language:cpp+author:codegen-sh[bot]+is:merged": "codegen_merged",
 }
 
 
@@ -57,7 +57,7 @@ def collect_data():
 
     csv_file = Path("data.csv")
     is_new_file = not csv_file.exists()
-    with csv_file.open("a", newline="") as f:
+    with csv_file.open("a", newline="", encoding='utf-8') as f:
         writer = csv.writer(f)
         if is_new_file:
             writer.writerow(
@@ -90,7 +90,7 @@ def update_html_with_latest_data():
         return
 
     # Update the last updated timestamp in the HTML
-    html_content = html_file.read_text()
+    html_content = html_file.read_text(encoding='utf-8')
 
     # Get current timestamp in the format used in the HTML
     now = dt.datetime.now(dt.UTC)
@@ -103,7 +103,7 @@ def update_html_with_latest_data():
         html_content,
     )
 
-    html_file.write_text(updated_html)
+    html_file.write_text(updated_html, encoding='utf-8')
     print(f"Updated HTML timestamp to: {timestamp_str}")
 
 

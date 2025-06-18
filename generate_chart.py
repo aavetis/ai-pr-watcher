@@ -26,7 +26,7 @@ def generate_chart(csv_file=None):
         return False
 
     # Create chart
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, encoding='utf-8')
     # Fix timestamp format - replace special dash characters with regular hyphens
     df["timestamp"] = df["timestamp"].str.replace("‑", "-")
     df["timestamp"] = pd.to_datetime(df["timestamp"])
@@ -545,7 +545,7 @@ def update_readme(df):
 | Codegen | {codegen_total} | {codegen_merged} | {codegen_rate:.2f}% |"""
 
     # Read the current README content
-    readme_content = readme_path.read_text()
+    readme_content = readme_path.read_text(encoding='utf-8')
 
     # Split content at the statistics header (if it exists)
     if "## Current Statistics" in readme_content:
@@ -555,7 +555,7 @@ def update_readme(df):
         new_content = f"{readme_content}\n\n{table_content}"
 
     # Write the updated content back
-    readme_path.write_text(new_content)
+    readme_path.write_text(new_content, encoding='utf-8')
     print(f"README.md updated with latest statistics.")
     return True
 
@@ -595,7 +595,7 @@ def update_github_pages(df):
     timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
     
     # Read the current index.html content
-    index_content = index_path.read_text()
+    index_content = index_path.read_text(encoding='utf-8')
     
     # Update the table data
     index_content = re.sub(
@@ -636,7 +636,7 @@ def update_github_pages(df):
     )
     
     # Write the updated content back
-    index_path.write_text(index_content)
+    index_path.write_text(index_content, encoding='utf-8')
     print(f"GitHub Pages updated with latest statistics.")
     return True
 
