@@ -8,23 +8,17 @@ import datetime as dt
 import re
 from pathlib import Path
 import requests
+from agents import AGENTS
 
 # Basic headers for GitHub public API
 HEADERS = {"Accept": "application/vnd.github+json", "User-Agent": "PR-Watcher"}
 
-# Search queries - tracking merged PRs
-Q = {
-    "is:pr+head:copilot/": "copilot_total",
-    "is:pr+head:copilot/+is:merged": "copilot_merged",
-    "is:pr+head:codex/": "codex_total",
-    "is:pr+head:codex/+is:merged": "codex_merged",
-    "is:pr+head:cursor/": "cursor_total",
-    "is:pr+head:cursor/+is:merged": "cursor_merged",
-    "author:devin-ai-integration[bot]": "devin_total",
-    "author:devin-ai-integration[bot]+is:merged": "devin_merged",
-    "author:codegen-sh[bot]": "codegen_total",
-    "author:codegen-sh[bot]+is:merged": "codegen_merged",
-}
+# Build query mapping from configured agents
+Q = {}
+for agent in AGENTS:
+    slug = agent["slug"]
+    Q[agent["queries"]["total"]] = f"{slug}_total"
+    Q[agent["queries"]["merged"]] = f"{slug}_merged"
 
 
 def collect_data():
@@ -41,40 +35,23 @@ def collect_data():
 
     # Save data to CSV
     timestamp = dt.datetime.now(dt.UTC).strftime("%Y‑%m‑%d %H:%M:%S")
-    row = [
-        timestamp,
-        cnt["copilot_total"],
-        cnt["copilot_merged"],
-        cnt["codex_total"],
-        cnt["codex_merged"],
-        cnt["cursor_total"],
-        cnt["cursor_merged"],
-        cnt["devin_total"],
-        cnt["devin_merged"],
-        cnt["codegen_total"],
-        cnt["codegen_merged"],
-    ]
+    row = [timestamp]
+    for agent in AGENTS:
+        slug = agent["slug"]
+        row.append(cnt[f"{slug}_total"])
+        row.append(cnt[f"{slug}_merged"])
 
     csv_file = Path("data.csv")
     is_new_file = not csv_file.exists()
     with csv_file.open("a", newline="") as f:
         writer = csv.writer(f)
         if is_new_file:
-            writer.writerow(
-                [
-                    "timestamp",
-                    "copilot_total",
-                    "copilot_merged",
-                    "codex_total",
-                    "codex_merged",
-                    "cursor_total",
-                    "cursor_merged",
-                    "devin_total",
-                    "devin_merged",
-                    "codegen_total",
-                    "codegen_merged",
-                ]
-            )
+            header = ["timestamp"]
+            for agent in AGENTS:
+                slug = agent["slug"]
+                header.append(f"{slug}_total")
+                header.append(f"{slug}_merged")
+            writer.writerow(header)
         writer.writerow(row)
 
     return csv_file
