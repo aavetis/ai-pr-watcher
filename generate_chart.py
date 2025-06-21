@@ -3,6 +3,7 @@
 # deps: pandas, matplotlib, numpy
 
 from pathlib import Path
+from string import Template
 import pandas as pd
 import matplotlib
 
@@ -12,6 +13,7 @@ import numpy as np
 import datetime as dt
 import re
 import json
+from agents import AGENTS
 
 
 def generate_chart(csv_file=None):
@@ -44,47 +46,18 @@ def generate_chart(csv_file=None):
         df = df.iloc[indices]
         print(f"Limited chart to 8 data points evenly distributed across {total_points} total points.")
 
-    # Calculate percentages with safety checks
-    df["copilot_percentage"] = df.apply(
-        lambda row: (
-            (row["copilot_merged"] / row["copilot_total"] * 100)
-            if row["copilot_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codex_percentage"] = df.apply(
-        lambda row: (
-            (row["codex_merged"] / row["codex_total"] * 100)
-            if row["codex_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["cursor_percentage"] = df.apply(
-        lambda row: (
-            (row["cursor_merged"] / row["cursor_total"] * 100)
-            if row["cursor_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["devin_percentage"] = df.apply(
-        lambda row: (
-            (row["devin_merged"] / row["devin_total"] * 100)
-            if row["devin_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
-    df["codegen_percentage"] = df.apply(
-        lambda row: (
-            (row["codegen_merged"] / row["codegen_total"] * 100)
-            if row["codegen_total"] > 0
-            else 0
-        ),
-        axis=1,
-    )
+    # Calculate success percentages for each agent
+    for agent in AGENTS:
+        slug = agent["slug"]
+        perc_col = f"{slug}_percentage"
+        total_col = f"{slug}_total"
+        merged_col = f"{slug}_merged"
+        df[perc_col] = df.apply(
+            lambda row: (row[merged_col] / row[total_col] * 100)
+            if row[total_col] > 0
+            else 0,
+            axis=1,
+        )
 
     # Adjust chart size based on data points, adding extra space for legends
     num_points = len(df)
@@ -104,157 +77,52 @@ def generate_chart(csv_file=None):
     # Adjust bar width based on number of data points (5 groups now)
     width = min(0.16, 0.8 / max(1, num_points * 0.6))
 
-    # Bar charts for totals and merged
-    bars_copilot_total = ax1.bar(
-        x - 2*width,
-        df["copilot_total"],
-        width,
-        label="Copilot Total",
-        alpha=0.7,
-        color="#87CEEB",
-    )
-    bars_copilot_merged = ax1.bar(
-        x - 2*width,
-        df["copilot_merged"],
-        width,
-        label="Copilot Merged",
-        alpha=1.0,
-        color="#4682B4",
-    )
+    # Bar and line charts for each agent
+    marker_styles = ["o", "s", "d", "^", "v", "x", "*", "P", "X", "+"]
+    bar_handles_total = []
+    bar_handles_merged = []
+    line_handles = []
 
-    bars_codex_total = ax1.bar(
-        x - 1*width,
-        df["codex_total"],
-        width,
-        label="Codex Total",
-        alpha=0.7,
-        color="#FFA07A",
-    )
-    bars_codex_merged = ax1.bar(
-        x - 1*width,
-        df["codex_merged"],
-        width,
-        label="Codex Merged",
-        alpha=1.0,
-        color="#CD5C5C",
-    )
+    offsets = (np.arange(len(AGENTS)) - len(AGENTS) // 2) * width
 
-    bars_cursor_total = ax1.bar(
-        x + 0*width,
-        df["cursor_total"],
-        width,
-        label="Cursor Total",
-        alpha=0.7,
-        color="#DDA0DD",
-    )
-    bars_cursor_merged = ax1.bar(
-        x + 0*width,
-        df["cursor_merged"],
-        width,
-        label="Cursor Merged",
-        alpha=1.0,
-        color="#9370DB",
-    )
+    for idx, (agent, offset) in enumerate(zip(AGENTS, offsets)):
+        slug = agent["slug"]
+        name = agent["name"]
+        colors = agent["colors"]
 
-    bars_devin_total = ax1.bar(
-        x + 1*width,
-        df["devin_total"],
-        width,
-        label="Devin Total",
-        alpha=0.7,
-        color="#98FB98",
-    )
-    bars_devin_merged = ax1.bar(
-        x + 1*width,
-        df["devin_merged"],
-        width,
-        label="Devin Merged",
-        alpha=1.0,
-        color="#228B22",
-    )
+        bars_total = ax1.bar(
+            x + offset,
+            df[f"{slug}_total"],
+            width,
+            label=f"{name} Total",
+            alpha=0.7,
+            color=colors["total"],
+        )
+        bars_merged = ax1.bar(
+            x + offset,
+            df[f"{slug}_merged"],
+            width,
+            label=f"{name} Merged",
+            alpha=1.0,
+            color=colors["merged"],
+        )
 
-    bars_codegen_total = ax1.bar(
-        x + 2*width,
-        df["codegen_total"],
-        width,
-        label="Codegen Total",
-        alpha=0.7,
-        color="#FFE4B5",
-    )
-    bars_codegen_merged = ax1.bar(
-        x + 2*width,
-        df["codegen_merged"],
-        width,
-        label="Codegen Merged",
-        alpha=1.0,
-        color="#DAA520",
-    )
+        line = ax2.plot(
+            x,
+            df[f"{slug}_percentage"],
+            marker_styles[idx % len(marker_styles)] + "-",
+            color=colors["line"],
+            linewidth=3,
+            markersize=10,
+            label=f"{name} Success %",
+            markerfacecolor="white",
+            markeredgewidth=2,
+            markeredgecolor=colors["line"],
+        )
 
-    # Line charts for percentages (on secondary y-axis)
-    line_copilot = ax2.plot(
-        x,
-        df["copilot_percentage"],
-        "o-",
-        color="#000080",
-        linewidth=3,
-        markersize=10,
-        label="Copilot Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#000080",
-    )
-
-    line_codex = ax2.plot(
-        x,
-        df["codex_percentage"],
-        "s-",
-        color="#8B0000",
-        linewidth=3,
-        markersize=10,
-        label="Codex Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#8B0000",
-    )
-
-    line_cursor = ax2.plot(
-        x,
-        df["cursor_percentage"],
-        "d-",
-        color="#800080",
-        linewidth=3,
-        markersize=10,
-        label="Cursor Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#800080",
-    )
-
-    line_devin = ax2.plot(
-        x,
-        df["devin_percentage"],
-        "^-",
-        color="#006400",
-        linewidth=3,
-        markersize=10,
-        label="Devin Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#006400",
-    )
-
-    line_codegen = ax2.plot(
-        x,
-        df["codegen_percentage"],
-        "v-",
-        color="#B8860B",
-        linewidth=3,
-        markersize=10,
-        label="Codegen Success %",
-        markerfacecolor="white",
-        markeredgewidth=2,
-        markeredgecolor="#B8860B",
-    )
+        bar_handles_total.append(bars_total)
+        bar_handles_merged.append(bars_merged)
+        line_handles.append(line)
 
     # Customize the chart
     ax1.set_xlabel("Data Points", fontsize=12, fontweight="bold")
@@ -308,77 +176,27 @@ def generate_chart(csv_file=None):
                     color="black",
                 )
 
-    add_value_labels(ax1, bars_copilot_total)
-    add_value_labels(ax1, bars_copilot_merged)
-    add_value_labels(ax1, bars_codex_total)
-    add_value_labels(ax1, bars_codex_merged)
-    add_value_labels(ax1, bars_cursor_total)
-    add_value_labels(ax1, bars_cursor_merged)
-    add_value_labels(ax1, bars_devin_total)
-    add_value_labels(ax1, bars_devin_merged)
-    add_value_labels(ax1, bars_codegen_total)
-    add_value_labels(ax1, bars_codegen_merged)
+    for bars in bar_handles_total + bar_handles_merged:
+        add_value_labels(ax1, bars)
 
     # Add percentage labels on line points (with validation and skip 0.0%)
-    for i, (cop_pct, cod_pct, cur_pct, dev_pct, cg_pct) in enumerate(
-        zip(df["copilot_percentage"], df["codex_percentage"], df["cursor_percentage"], df["devin_percentage"], df["codegen_percentage"])
-    ):
-        # Only add labels if percentages are valid numbers and not 0.0%
-        if pd.notna(cop_pct) and pd.notna(cod_pct) and pd.notna(cur_pct) and pd.notna(dev_pct) and pd.notna(cg_pct):
-            if cop_pct > 0.0:
+    for i in range(len(df)):
+        for idx, agent in enumerate(AGENTS):
+            perc = df.iloc[i][f"{agent['slug']}_percentage"]
+            if pd.notna(perc) and perc > 0:
+                if idx == 0:
+                    y_off = 15
+                else:
+                    y_off = -20 - (idx - 1) * 15
                 ax2.annotate(
-                    f"{cop_pct:.1f}%",
-                    (i, cop_pct),
+                    f"{perc:.1f}%",
+                    (i, perc),
                     textcoords="offset points",
-                    xytext=(0, 15),
+                    xytext=(0, y_off),
                     ha="center",
                     fontsize=10,
                     fontweight="bold",
-                    color="#000080",
-                )
-            if cod_pct > 0.0:
-                ax2.annotate(
-                    f"{cod_pct:.1f}%",
-                    (i, cod_pct),
-                    textcoords="offset points",
-                    xytext=(0, -20),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#8B0000",
-                )
-            if cur_pct > 0.0:
-                ax2.annotate(
-                    f"{cur_pct:.1f}%",
-                    (i, cur_pct),
-                    textcoords="offset points",
-                    xytext=(0, -35),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#800080",
-                )
-            if dev_pct > 0.0:
-                ax2.annotate(
-                    f"{dev_pct:.1f}%",
-                    (i, dev_pct),
-                    textcoords="offset points",
-                    xytext=(0, -50),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#006400",
-                )
-            if cg_pct > 0.0:
-                ax2.annotate(
-                    f"{cg_pct:.1f}%",
-                    (i, cg_pct),
-                    textcoords="offset points",
-                    xytext=(0, -65),
-                    ha="center",
-                    fontsize=10,
-                    fontweight="bold",
-                    color="#B8860B",
+                    color=agent['colors']['line'],
                 )
 
     plt.tight_layout(pad=6.0)
@@ -425,16 +243,10 @@ def export_chart_data_json(df):
         chart_data["labels"].append(timestamp.strftime("%m/%d %H:%M"))
     
     # Color scheme matching the Python chart
-    colors = {
-        "copilot": {"total": "#87CEEB", "merged": "#4682B4", "line": "#000080"},
-        "codex": {"total": "#FFA07A", "merged": "#CD5C5C", "line": "#8B0000"},
-        "cursor": {"total": "#DDA0DD", "merged": "#9370DB", "line": "#800080"},
-        "devin": {"total": "#98FB98", "merged": "#228B22", "line": "#006400"},
-        "codegen": {"total": "#FFE4B5", "merged": "#DAA520", "line": "#B8860B"}
-    }
+    colors = {a["slug"]: a["colors"] for a in AGENTS}
     
     # Add bar datasets for totals and merged PRs
-    for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+    for agent in [a["slug"] for a in AGENTS]:
         # Process data to replace leading zeros with None (null in JSON)
         total_data = df[f"{agent}_total"].tolist()
         merged_data = df[f"{agent}_merged"].tolist()
@@ -502,142 +314,109 @@ def export_chart_data_json(df):
     return True
 
 
-def update_readme(df):
-    """Update the README.md with the latest statistics"""
-    readme_path = Path("README.md")
+def build_readme_sources():
+    lines = []
+    for a in AGENTS:
+        lines.append(
+            f"- **All {a['name']} PRs**: [is:pr head:{a['slug']}/](https://github.com/search?q={a['queries']['total']}&type=pullrequests)"
+        )
+        lines.append(
+            f"- **Merged {a['name']} PRs**: [is:pr head:{a['slug']}/ is:merged](https://github.com/search?q={a['queries']['merged']}&type=pullrequests)"
+        )
+    return "\n".join(lines)
 
-    # Skip if README doesn't exist
-    if not readme_path.exists():
-        print(f"Warning: {readme_path} not found, skipping README update.")
+
+def build_readme_table(latest):
+    rows = []
+    for a in AGENTS:
+        slug = a["slug"]
+        total = latest[f"{slug}_total"]
+        merged = latest[f"{slug}_merged"]
+        rate = merged / total * 100 if total > 0 else 0
+        rows.append(
+            f"| {a['name']} | {total:,} | {merged:,} | {rate:.2f}% |"
+        )
+    return "\n".join(rows)
+
+
+def build_html_rows(latest):
+    rows = []
+    for a in AGENTS:
+        slug = a["slug"]
+        total = latest[f"{slug}_total"]
+        merged = latest[f"{slug}_merged"]
+        rate = merged / total * 100 if total > 0 else 0
+        rows.append(
+            f"<tr data-agent=\"{slug}\">"
+            f"<td class=\"agent-cell\"><div class=\"agent-info\">"
+            f"<span class=\"agent-icon\" style=\"background-color: {a['colors']['icon']}\"></span>"
+            f"<a href=\"{a['link']}\" target=\"_blank\" class=\"agent-link\">{a['display']}</a>"
+            f"</div></td>"
+            f"<td class=\"metric-cell\"><a href=\"https://github.com/search?q={a['queries']['total']}&type=pullrequests\" target=\"_blank\" class=\"metric-link\"><span id=\"{slug}-total\">{total:,}</span></a></td>"
+            f"<td class=\"metric-cell\"><a href=\"https://github.com/search?q={a['queries']['merged']}&type=pullrequests\" target=\"_blank\" class=\"metric-link\"><span id=\"{slug}-merged\">{merged:,}</span></a></td>"
+            f"<td class=\"rate-cell\"><span id=\"{slug}-rate\">{rate:.2f}%</span></td>"
+            f"</tr>"
+        )
+    return "\n".join(rows)
+
+
+def build_toggle_buttons():
+    buttons = []
+    for a in AGENTS:
+        btn_id = f"toggle{a['name'].replace(' ', '')}"
+        buttons.append(
+            f"<button id=\"{btn_id}\" class=\"toggle-btn active\" data-agent=\"{a['slug']}\">"
+            f"<span class=\"toggle-icon\" style=\"background-color: {a['colors']['icon']}\"></span>{a['display']}</button>"
+        )
+    return "\n".join(buttons)
+
+
+def update_readme(df):
+    """Render README.md from template with the latest statistics."""
+    template_path = Path("templates/readme_template.md")
+    output_path = Path("README.md")
+
+    if not template_path.exists():
+        print(f"Warning: {template_path} missing, skipping README update.")
         return False
 
-    # Get the latest data
     latest = df.iloc[-1]
 
-    # Calculate merge rates
-    copilot_rate = latest.copilot_merged / latest.copilot_total * 100
-    codex_rate = latest.codex_merged / latest.codex_total * 100
-    cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
-    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
-    codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
+    subs = {
+        "DATA_SOURCES": build_readme_sources(),
+        "STATS_ROWS": build_readme_table(latest),
+    }
 
-    # Format numbers with commas
-    copilot_total = f"{latest.copilot_total:,}"
-    copilot_merged = f"{latest.copilot_merged:,}"
-    codex_total = f"{latest.codex_total:,}"
-    codex_merged = f"{latest.codex_merged:,}"
-    cursor_total = f"{latest.cursor_total:,}"
-    cursor_merged = f"{latest.cursor_merged:,}"
-    devin_total = f"{latest.devin_total:,}"
-    devin_merged = f"{latest.devin_merged:,}"
-    codegen_total = f"{latest.codegen_total:,}"
-    codegen_merged = f"{latest.codegen_merged:,}"
-
-    # Create the new table content
-    table_content = f"""## Current Statistics
-
-| Project | Total PRs | Merged PRs | Merge Rate |
-| ------- | --------- | ---------- | ---------- |
-| Copilot | {copilot_total} | {copilot_merged} | {copilot_rate:.2f}% |
-| Codex   | {codex_total} | {codex_merged} | {codex_rate:.2f}% |
-| Cursor  | {cursor_total} | {cursor_merged} | {cursor_rate:.2f}% |
-| Devin   | {devin_total} | {devin_merged} | {devin_rate:.2f}% |
-| Codegen | {codegen_total} | {codegen_merged} | {codegen_rate:.2f}% |"""
-
-    # Read the current README content
-    readme_content = readme_path.read_text()
-
-    # Split content at the statistics header (if it exists)
-    if "## Current Statistics" in readme_content:
-        base_content = readme_content.split("## Current Statistics")[0].rstrip()
-        new_content = f"{base_content}\n\n{table_content}"
-    else:
-        new_content = f"{readme_content}\n\n{table_content}"
-
-    # Write the updated content back
-    readme_path.write_text(new_content)
-    print(f"README.md updated with latest statistics.")
+    template_text = template_path.read_text()
+    rendered = Template(template_text).substitute(subs)
+    output_path.write_text(rendered)
+    print("README.md updated with latest statistics.")
     return True
 
 
 def update_github_pages(df):
-    """Update the GitHub Pages website with the latest statistics"""
-    index_path = Path("docs/index.html")
-    
-    # Skip if index.html doesn't exist
-    if not index_path.exists():
-        print(f"Warning: {index_path} not found, skipping GitHub Pages update.")
-        return False
-    
-    # Get the latest data
-    latest = df.iloc[-1]
-    
-    # Calculate merge rates
-    copilot_rate = latest.copilot_merged / latest.copilot_total * 100
-    codex_rate = latest.codex_merged / latest.codex_total * 100
-    cursor_rate = latest.cursor_merged / latest.cursor_total * 100 if latest.cursor_total > 0 else 0
-    devin_rate = latest.devin_merged / latest.devin_total * 100 if latest.devin_total > 0 else 0
-    codegen_rate = latest.codegen_merged / latest.codegen_total * 100 if latest.codegen_total > 0 else 0
+    """Render the GitHub Pages HTML from a template."""
+    template_path = Path("templates/index_template.html")
+    output_path = Path("docs/index.html")
 
-    # Format numbers with commas
-    copilot_total = f"{latest.copilot_total:,}"
-    copilot_merged = f"{latest.copilot_merged:,}"
-    codex_total = f"{latest.codex_total:,}"
-    codex_merged = f"{latest.codex_merged:,}"
-    cursor_total = f"{latest.cursor_total:,}"
-    cursor_merged = f"{latest.cursor_merged:,}"
-    devin_total = f"{latest.devin_total:,}"
-    devin_merged = f"{latest.devin_merged:,}"
-    codegen_total = f"{latest.codegen_total:,}"
-    codegen_merged = f"{latest.codegen_merged:,}"
-    
-    # Current timestamp for last updated
-    timestamp = dt.datetime.now().strftime("%B %d, %Y %H:%M UTC")
-    
-    # Read the current index.html content
-    index_content = index_path.read_text()
-    
-    # Update the table data
-    index_content = re.sub(
-        r'<td>Copilot</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Copilot</td>\n                        <td>{copilot_total}</td>\n                        <td>{copilot_merged}</td>\n                        <td>{copilot_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Codex</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Codex</td>\n                        <td>{codex_total}</td>\n                        <td>{codex_merged}</td>\n                        <td>{codex_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Cursor</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Cursor</td>\n                        <td>{cursor_total}</td>\n                        <td>{cursor_merged}</td>\n                        <td>{cursor_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Devin</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Devin</td>\n                        <td>{devin_total}</td>\n                        <td>{devin_merged}</td>\n                        <td>{devin_rate:.2f}%</td>',
-        index_content
-    )
-    
-    index_content = re.sub(
-        r'<td>Codegen</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>\s*<td>[^<]*</td>',
-        f'<td>Codegen</td>\n                        <td>{codegen_total}</td>\n                        <td>{codegen_merged}</td>\n                        <td>{codegen_rate:.2f}%</td>',
-        index_content
-    )
-    
-    # Update the last updated timestamp
-    index_content = re.sub(
-        r'<span id="last-updated">[^<]*</span>',
-        f'<span id="last-updated">{timestamp}</span>',
-        index_content
-    )
-    
-    # Write the updated content back
-    index_path.write_text(index_content)
-    print(f"GitHub Pages updated with latest statistics.")
+    if not template_path.exists():
+        print(f"Warning: {template_path} missing, skipping GitHub Pages update.")
+        return False
+
+    latest = df.iloc[-1]
+
+    subs = {
+        "AGENT_TABLE_ROWS": build_html_rows(latest),
+        "AGENT_TOGGLES": build_toggle_buttons(),
+        "AGENT_LIST_JS": json.dumps([a["slug"] for a in AGENTS]),
+        "AGENT_REGEX": "|".join(a["slug"] for a in AGENTS),
+        "LAST_UPDATED": dt.datetime.now().strftime("%B %d, %Y %H:%M UTC"),
+    }
+
+    template_text = template_path.read_text()
+    rendered = Template(template_text).substitute(subs)
+    output_path.write_text(rendered)
+    print("GitHub Pages updated with latest statistics.")
     return True
 
 

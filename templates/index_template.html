@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Coding Agents</title>
+    <link rel="stylesheet" href="styles.css" />
+    <meta http-equiv="refresh" content="3600" />
+    <!-- Auto-refresh every hour -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>AI Coding Agents</h1>
+        <p class="subtitle">
+          Tracking the performance of the various coding agents.
+        </p>
+      </header>
+
+      <section class="data-sources">
+        <h2>Agents</h2>
+        <p>
+          Click on each agent to learn more about them. Click on each metric to
+          explore the queries live.
+        </p>
+      </section>
+
+      <section class="statistics">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th class="agent-col">Coding Agent</th>
+              <th class="metric-col">Total PRs</th>
+              <th class="metric-col">Merged PRs</th>
+              <th class="rate-col">Success Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            $AGENT_TABLE_ROWS
+          </tbody>
+        </table>
+      </section>
+
+      <section class="chart">
+        <h2>Historic Chart</h2>
+        <div class="chart-controls">
+          <div class="control-row">
+            <div class="control-section">
+              <span class="control-label">AGENTS</span>
+              <div class="toggle-buttons">
+                $AGENT_TOGGLES
+              </div>
+            </div>
+            <div class="control-section">
+              <span class="control-label">VIEW MODE</span>
+              <div class="toggle-buttons">
+                <button id="viewAll" class="view-btn active" data-view="all">
+                  <span class="view-icon">●</span>Complete View
+                </button>
+                <button id="viewBarsOnly" class="view-btn" data-view="bars">
+                  Volume Only
+                </button>
+                <button id="viewLinesOnly" class="view-btn" data-view="lines">
+                  Success Rate Only
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="prChart" width="800" height="400"></canvas>
+        </div>
+        <div class="chart-fallback">
+          <img src="chart.png" alt="PR Analytics Chart" class="chart-image" />
+          <p>
+            <em>Interactive chart failed to load. Showing static version.</em>
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Last updated: <span id="last-updated">$LAST_UPDATED</span>
+        </p>
+        <p>
+          <a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a>
+        </p>
+      </footer>
+    </div>
+    <script>
+      // Load chart data and create interactive chart
+      let chartInstance = null;
+      let chartData = null;
+
+      async function loadChartData() {
+        try {
+          const response = await fetch("chart-data.json");
+          chartData = await response.json();
+          initializeChart();
+        } catch (error) {
+          console.error("Failed to load chart data:", error);
+          showFallback();
+        }
+      }
+
+      function showFallback() {
+        document.querySelector(".chart-container").style.display = "none";
+        document.querySelector(".chart-controls").style.display = "none";
+        document.querySelector(".chart-fallback").style.display = "block";
+      }
+
+      function initializeChart() {
+        const ctx = document.getElementById("prChart").getContext("2d");
+
+        chartInstance = new Chart(ctx, {
+          type: "bar",
+          data: chartData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              intersect: false,
+              mode: "point",
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: "PR Volume vs Success Rate",
+                font: {
+                  size: 16,
+                  weight: "bold",
+                },
+              },
+              legend: {
+                display: true,
+                position: "right",
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  title: function (context) {
+                    return context[0].label;
+                  },
+                  label: function (context) {
+                    const datasetLabel = context.dataset.label;
+                    const value = context.parsed.y;
+
+                    if (datasetLabel.includes("Success %")) {
+                      return datasetLabel + ": " + value.toFixed(1) + "%";
+                    } else {
+                      return (
+                        datasetLabel + ": " + value.toLocaleString() + " PRs"
+                      );
+                    }
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time",
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Number of PRs",
+                },
+                beginAtZero: true,
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Success Rate (%)",
+                },
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  drawOnChartArea: false,
+                },
+              },
+            },
+          },
+        });
+
+        // Hide fallback and show interactive chart
+        document.querySelector(".chart-fallback").style.display = "none";
+        document.querySelector(".chart-container").style.display = "block";
+        document.querySelector(".chart-controls").style.display = "block";
+
+        // Update statistics table with latest data
+        updateStatisticsTable();
+
+        // Set up toggle functionality
+        setupToggleButtons();
+      }
+
+      function updateStatisticsTable() {
+        if (!chartData || !chartData.datasets) return;
+
+        // Get the latest data point (last index)
+        const latestIndex = chartData.labels.length - 1;
+
+        const agents = $AGENT_LIST_JS;
+
+        agents.forEach((agent) => {
+          // Find datasets for this agent
+          const totalDataset = chartData.datasets.find(
+            (d) =>
+              d.label.toLowerCase().includes(agent) &&
+              d.label.toLowerCase().includes("total")
+          );
+          const mergedDataset = chartData.datasets.find(
+            (d) =>
+              d.label.toLowerCase().includes(agent) &&
+              d.label.toLowerCase().includes("merged")
+          );
+
+          if (totalDataset && mergedDataset) {
+            const total = totalDataset.data[latestIndex] || 0;
+            const merged = mergedDataset.data[latestIndex] || 0;
+            const rate = total > 0 ? (merged / total) * 100 : 0;
+
+            // Update table cells
+            const totalElement = document.getElementById(`${agent}-total`);
+            const mergedElement = document.getElementById(`${agent}-merged`);
+            const rateElement = document.getElementById(`${agent}-rate`);
+
+            if (totalElement) totalElement.textContent = total.toLocaleString();
+            if (mergedElement)
+              mergedElement.textContent = merged.toLocaleString();
+            if (rateElement) rateElement.textContent = rate.toFixed(1) + "%";
+          }
+        });
+      }
+
+      function setupToggleButtons() {
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+        const viewButtons = document.querySelectorAll(".view-btn");
+
+        // Agent toggle functionality
+        toggleButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const agent = this.dataset.agent;
+            const isActive = this.classList.contains("active");
+
+            // Toggle button state
+            this.classList.toggle("active");
+
+            // Get current view mode
+            const activeViewBtn = document.querySelector(".view-btn.active");
+            const currentView = activeViewBtn
+              ? activeViewBtn.dataset.view
+              : "all";
+
+            // Find and toggle datasets for this agent
+            chartInstance.data.datasets.forEach((dataset, index) => {
+              const labelLower = dataset.label.toLowerCase();
+              if (labelLower.includes(agent)) {
+                const isLine = dataset.type === "line";
+                const isBar = dataset.type === "bar";
+
+                if (isActive) {
+                  // Was active, now hiding
+                  dataset.hidden = true;
+                } else {
+                  // Was hidden, now showing (but respect view mode)
+                  switch (currentView) {
+                    case "all":
+                      dataset.hidden = false;
+                      break;
+                    case "bars":
+                      dataset.hidden = isLine;
+                      break;
+                    case "lines":
+                      dataset.hidden = isBar;
+                      break;
+                  }
+                }
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+
+        // View mode functionality
+        viewButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const view = this.dataset.view;
+
+            // Update button states
+            viewButtons.forEach((btn) => btn.classList.remove("active"));
+            this.classList.add("active");
+
+            // Show/hide datasets based on view mode and agent toggles
+            chartInstance.data.datasets.forEach((dataset) => {
+              const isLine = dataset.type === "line";
+              const isBar = dataset.type === "bar";
+
+              // Get the agent name from the dataset label
+              const agentMatch = dataset.label
+                .toLowerCase()
+                .match(/($AGENT_REGEX)/);
+              const agent = agentMatch ? agentMatch[1] : null;
+
+              // Check if agent is currently enabled
+              const agentButton = document.querySelector(
+                `.toggle-btn[data-agent="${agent}"]`
+              );
+              const agentEnabled =
+                agentButton && agentButton.classList.contains("active");
+
+              switch (view) {
+                case "all":
+                  dataset.hidden = !agentEnabled;
+                  break;
+                case "bars":
+                  dataset.hidden = !agentEnabled || isLine;
+                  break;
+                case "lines":
+                  dataset.hidden = !agentEnabled || isBar;
+                  break;
+              }
+            });
+
+            chartInstance.update();
+          });
+        });
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", function () {
+        loadChartData();
+
+        // Update last updated timestamp
+        const now = new Date();
+        const formattedDate = now.toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "UTC",
+          timeZoneName: "short",
+        });
+        document.getElementById("last-updated").textContent = formattedDate;
+      });
+    </script>
+  </body>
+</html>
