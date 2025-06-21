@@ -237,9 +237,9 @@
             const rate = total > 0 ? (merged / total) * 100 : 0;
 
             // Update table cells
-            const totalElement = document.getElementById(`${agent}-total`);
-            const mergedElement = document.getElementById(`${agent}-merged`);
-            const rateElement = document.getElementById(`${agent}-rate`);
+            const totalElement = document.getElementById(`$${agent}-total`);
+            const mergedElement = document.getElementById(`$${agent}-merged`);
+            const rateElement = document.getElementById(`$${agent}-rate`);
 
             if (totalElement) totalElement.textContent = total.toLocaleString();
             if (mergedElement)
@@ -321,7 +321,7 @@
 
               // Check if agent is currently enabled
               const agentButton = document.querySelector(
-                `.toggle-btn[data-agent="${agent}"]`
+                `.toggle-btn[data-agent="$${agent}"]`
               );
               const agentEnabled =
                 agentButton && agentButton.classList.contains("active");

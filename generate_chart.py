@@ -371,6 +371,20 @@ def build_toggle_buttons():
     return "\n".join(buttons)
 
 
+def build_substitutions(df):
+    """Prepare placeholder values for README and HTML templates."""
+    latest = df.iloc[-1]
+    return {
+        "DATA_SOURCES": build_readme_sources(),
+        "STATS_ROWS": build_readme_table(latest),
+        "AGENT_TABLE_ROWS": build_html_rows(latest),
+        "AGENT_TOGGLES": build_toggle_buttons(),
+        "AGENT_LIST_JS": json.dumps([a["slug"] for a in AGENTS]),
+        "AGENT_REGEX": "|".join(a["slug"] for a in AGENTS),
+        "LAST_UPDATED": dt.datetime.now().strftime("%B %d, %Y %H:%M UTC"),
+    }
+
+
 def update_readme(df):
     """Render README.md from template with the latest statistics."""
     template_path = Path("templates/readme_template.md")
@@ -380,12 +394,7 @@ def update_readme(df):
         print(f"Warning: {template_path} missing, skipping README update.")
         return False
 
-    latest = df.iloc[-1]
-
-    subs = {
-        "DATA_SOURCES": build_readme_sources(),
-        "STATS_ROWS": build_readme_table(latest),
-    }
+    subs = build_substitutions(df)
 
     template_text = template_path.read_text()
     rendered = Template(template_text).substitute(subs)
@@ -403,15 +412,7 @@ def update_github_pages(df):
         print(f"Warning: {template_path} missing, skipping GitHub Pages update.")
         return False
 
-    latest = df.iloc[-1]
-
-    subs = {
-        "AGENT_TABLE_ROWS": build_html_rows(latest),
-        "AGENT_TOGGLES": build_toggle_buttons(),
-        "AGENT_LIST_JS": json.dumps([a["slug"] for a in AGENTS]),
-        "AGENT_REGEX": "|".join(a["slug"] for a in AGENTS),
-        "LAST_UPDATED": dt.datetime.now().strftime("%B %d, %Y %H:%M UTC"),
-    }
+    subs = build_substitutions(df)
 
     template_text = template_path.read_text()
     rendered = Template(template_text).substitute(subs)
