@@ -37,191 +37,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr data-agent="copilot">
-              <td class="agent-cell">
-                <div class="agent-info">
-                  <span
-                    class="agent-icon"
-                    style="background-color: #87ceeb"
-                  ></span>
-                  <a
-                    href="https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue"
-                    target="_blank"
-                    class="agent-link"
-                    >GitHub Copilot</a
-                  >
-                </div>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:copilot/&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="copilot-total">{{COPILOT_TOTAL}}</span>
-                </a>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="copilot-merged">{{COPILOT_MERGED}}</span>
-                </a>
-              </td>
-              <td class="rate-cell">
-                <span id="copilot-rate">{{COPILOT_RATE}}</span>
-              </td>
-            </tr>
-            <tr data-agent="codex">
-              <td class="agent-cell">
-                <div class="agent-info">
-                  <span
-                    class="agent-icon"
-                    style="background-color: #ff6b6b"
-                  ></span>
-                  <a
-                    href="https://openai.com/index/introducing-codex/"
-                    target="_blank"
-                    class="agent-link"
-                    >OpenAI Codex</a
-                  >
-                </div>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:codex/&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="codex-total">{{CODEX_TOTAL}}</span>
-                </a>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="codex-merged">{{CODEX_MERGED}}</span>
-                </a>
-              </td>
-              <td class="rate-cell">
-                <span id="codex-rate">{{CODEX_RATE}}</span>
-              </td>
-            </tr>
-            <tr data-agent="cursor">
-              <td class="agent-cell">
-                <div class="agent-info">
-                  <span
-                    class="agent-icon"
-                    style="background-color: #9b59b6"
-                  ></span>
-                  <a
-                    href="https://docs.cursor.com/background-agent"
-                    target="_blank"
-                    class="agent-link"
-                    >Cursor Agents</a
-                  >
-                </div>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:cursor/&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="cursor-total">{{CURSOR_TOTAL}}</span>
-                </a>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="cursor-merged">{{CURSOR_MERGED}}</span>
-                </a>
-              </td>
-              <td class="rate-cell">
-                <span id="cursor-rate">{{CURSOR_RATE}}</span>
-              </td>
-            </tr>
-            <tr data-agent="devin">
-              <td class="agent-cell">
-                <div class="agent-info">
-                  <span
-                    class="agent-icon"
-                    style="background-color: #52c41a"
-                  ></span>
-                  <a
-                    href="https://devin.ai/pricing"
-                    target="_blank"
-                    class="agent-link"
-                    >Devin</a
-                  >
-                </div>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="devin-total">{{DEVIN_TOTAL}}</span>
-                </a>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="devin-merged">{{DEVIN_MERGED}}</span>
-                </a>
-              </td>
-              <td class="rate-cell">
-                <span id="devin-rate">{{DEVIN_RATE}}</span>
-              </td>
-            </tr>
-            <tr data-agent="codegen">
-              <td class="agent-cell">
-                <div class="agent-info">
-                  <span
-                    class="agent-icon"
-                    style="background-color: #daa520"
-                  ></span>
-                  <a
-                    href="https://codegen.com/"
-                    target="_blank"
-                    class="agent-link"
-                    >Codegen</a
-                  >
-                </div>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="codegen-total">{{CODEGEN_TOTAL}}</span>
-                </a>
-              </td>
-              <td class="metric-cell">
-                <a
-                  href="https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests"
-                  target="_blank"
-                  class="metric-link"
-                >
-                  <span id="codegen-merged">{{CODEGEN_MERGED}}</span>
-                </a>
-              </td>
-              <td class="rate-cell">
-                <span id="codegen-rate">{{CODEGEN_RATE}}</span>
-              </td>
-            </tr>
+            <tr data-agent="copilot"><td class="agent-cell"><div class="agent-info"><span class="agent-icon" style="background-color: #87ceeb"></span><a href="https://docs.github.com/en/copilot/using-github-copilot/coding-agent/using-copilot-to-work-on-an-issue" target="_blank" class="agent-link">GitHub Copilot</a></div></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:copilot/&type=pullrequests" target="_blank" class="metric-link"><span id="copilot-total">17,310</span></a></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:copilot/+is:merged&type=pullrequests" target="_blank" class="metric-link"><span id="copilot-merged">9,953</span></a></td><td class="rate-cell"><span id="copilot-rate">57.50%</span></td></tr>
+<tr data-agent="codex"><td class="agent-cell"><div class="agent-info"><span class="agent-icon" style="background-color: #ff6b6b"></span><a href="https://openai.com/index/introducing-codex/" target="_blank" class="agent-link">OpenAI Codex</a></div></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:codex/&type=pullrequests" target="_blank" class="metric-link"><span id="codex-total">421,223</span></a></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:codex/+is:merged&type=pullrequests" target="_blank" class="metric-link"><span id="codex-merged">360,271</span></a></td><td class="rate-cell"><span id="codex-rate">85.53%</span></td></tr>
+<tr data-agent="cursor"><td class="agent-cell"><div class="agent-info"><span class="agent-icon" style="background-color: #9b59b6"></span><a href="https://docs.cursor.com/background-agent" target="_blank" class="agent-link">Cursor Agents</a></div></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:cursor/&type=pullrequests" target="_blank" class="metric-link"><span id="cursor-total">1,744</span></a></td><td class="metric-cell"><a href="https://github.com/search?q=is:pr+head:cursor/+is:merged&type=pullrequests" target="_blank" class="metric-link"><span id="cursor-merged">1,278</span></a></td><td class="rate-cell"><span id="cursor-rate">73.28%</span></td></tr>
+<tr data-agent="devin"><td class="agent-cell"><div class="agent-info"><span class="agent-icon" style="background-color: #52c41a"></span><a href="https://devin.ai/pricing" target="_blank" class="agent-link">Devin</a></div></td><td class="metric-cell"><a href="https://github.com/search?q=author:devin-ai-integration[bot]&type=pullrequests" target="_blank" class="metric-link"><span id="devin-total">29,624</span></a></td><td class="metric-cell"><a href="https://github.com/search?q=author:devin-ai-integration[bot]+is:merged&type=pullrequests" target="_blank" class="metric-link"><span id="devin-merged">18,084</span></a></td><td class="rate-cell"><span id="devin-rate">61.05%</span></td></tr>
+<tr data-agent="codegen"><td class="agent-cell"><div class="agent-info"><span class="agent-icon" style="background-color: #daa520"></span><a href="https://codegen.com/" target="_blank" class="agent-link">Codegen</a></div></td><td class="metric-cell"><a href="https://github.com/search?q=author:codegen-sh[bot]&type=pullrequests" target="_blank" class="metric-link"><span id="codegen-total">4,031</span></a></td><td class="metric-cell"><a href="https://github.com/search?q=author:codegen-sh[bot]+is:merged&type=pullrequests" target="_blank" class="metric-link"><span id="codegen-merged">1,614</span></a></td><td class="rate-cell"><span id="codegen-rate">40.04%</span></td></tr>
           </tbody>
         </table>
       </section>
@@ -233,61 +53,11 @@
             <div class="control-section">
               <span class="control-label">AGENTS</span>
               <div class="toggle-buttons">
-                <button
-                  id="toggleCopilot"
-                  class="toggle-btn active"
-                  data-agent="copilot"
-                >
-                  <span
-                    class="toggle-icon"
-                    style="background-color: #87ceeb"
-                  ></span
-                  >GitHub Copilot
-                </button>
-                <button
-                  id="toggleCodex"
-                  class="toggle-btn active"
-                  data-agent="codex"
-                >
-                  <span
-                    class="toggle-icon"
-                    style="background-color: #ff6b6b"
-                  ></span
-                  >OpenAI Codex
-                </button>
-                <button
-                  id="toggleCursor"
-                  class="toggle-btn active"
-                  data-agent="cursor"
-                >
-                  <span
-                    class="toggle-icon"
-                    style="background-color: #9b59b6"
-                  ></span
-                  >Cursor Agents
-                </button>
-                <button
-                  id="toggleDevin"
-                  class="toggle-btn active"
-                  data-agent="devin"
-                >
-                  <span
-                    class="toggle-icon"
-                    style="background-color: #52c41a"
-                  ></span
-                  >Devin
-                </button>
-                <button
-                  id="toggleCodegen"
-                  class="toggle-btn active"
-                  data-agent="codegen"
-                >
-                  <span
-                    class="toggle-icon"
-                    style="background-color: #daa520"
-                  ></span
-                  >Codegen
-                </button>
+                <button id="toggleCopilot" class="toggle-btn active" data-agent="copilot"><span class="toggle-icon" style="background-color: #87ceeb"></span>GitHub Copilot</button>
+<button id="toggleCodex" class="toggle-btn active" data-agent="codex"><span class="toggle-icon" style="background-color: #ff6b6b"></span>OpenAI Codex</button>
+<button id="toggleCursor" class="toggle-btn active" data-agent="cursor"><span class="toggle-icon" style="background-color: #9b59b6"></span>Cursor Agents</button>
+<button id="toggleDevin" class="toggle-btn active" data-agent="devin"><span class="toggle-icon" style="background-color: #52c41a"></span>Devin</button>
+<button id="toggleCodegen" class="toggle-btn active" data-agent="codegen"><span class="toggle-icon" style="background-color: #daa520"></span>Codegen</button>
               </div>
             </div>
             <div class="control-section">
@@ -319,7 +89,7 @@
 
       <footer>
         <p>
-          Last updated: <span id="last-updated">June 20, 2025 18:01 UTC</span>
+          Last updated: <span id="last-updated">June 20, 2025 21:45 UTC</span>
         </p>
         <p>
           <a href="https://github.com/aavetis/ai-pr-watcher">View on GitHub</a>
