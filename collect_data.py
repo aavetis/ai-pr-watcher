@@ -19,6 +19,8 @@ Q = {
     "author:devin-ai-integration[bot]+is:merged": "devin_merged",
     "author:codegen-sh[bot]": "codegen_total",
     "author:codegen-sh[bot]+is:merged": "codegen_merged",
+    "author:tembo-io[bot]": "tembo_total",
+    "author:tembo-io[bot]+is:merged": "tembo_merged",
 }
 
 
@@ -48,6 +50,8 @@ def collect_data():
         cnt["devin_merged"],
         cnt["codegen_total"],
         cnt["codegen_merged"],
+        cnt["tembo_total"],
+        cnt["tembo_merged"],
     ]
 
     csv_file = Path("data.csv")
@@ -68,6 +72,8 @@ def collect_data():
                     "devin_merged",
                     "codegen_total",
                     "codegen_merged",
+                    "tembo_total",
+                    "tembo_merged",
                 ]
             )
         writer.writerow(row)
