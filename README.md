@@ -32,6 +32,20 @@ Explore the GitHub search queries used:
 
 ![chart](docs/chart.png)
 
+---
+
+## About the Cosine Agent
+
+**Cosine** is an advanced coding agent for developers, now tracked alongside Copilot, Codex, Cursor, Devin, and Codegen.  
+- **Color in charts:** ![#FF00FF](https://placehold.co/15x15/FF00FF/FF00FF.png) `#FF00FF` (magenta family, used for totals/merged/lines)
+- **Learn more:** [https://cosine.dev/](https://cosine.dev/)
+
+## Current Statistics
+
+| Project | Total PRs | Merged PRs | Merge Rate |
+| ------- | --------- | ---------- | ---------- |{%- for agent in agents %}
+| {{ agent.display }} | {{ stats[agent.key].total | comma }} | {{ stats[agent.key].merged | comma }} | {{ stats[agent.key].rate | round(2) }}% |{%- endfor %}
+
 ## Current Statistics
 
 | Project | Total PRs | Merged PRs | Merge Rate |

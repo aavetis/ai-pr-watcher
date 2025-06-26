@@ -65,6 +65,15 @@ AGENTS = [
         "total_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]&type=pullrequests",
         "merged_query_url": "https://github.com/search?q=is:pr+author:codegen-sh[bot]+is:merged&type=pullrequests",
     },
+    {
+        "key": "cosine",
+        "display": "Cosine",
+        "long_name": "Cosine Agent",
+        "color": "#0ea5e9",
+        "info_url": "https://cosine.dev/",
+        "total_query_url": "https://github.com/search?q=is:pr+head:cosine/&type=pullrequests",
+        "merged_query_url": "https://github.com/search?q=is:pr+head:cosine/+is:merged&type=pullrequests",
+    },
 ]
 
 
@@ -156,6 +165,14 @@ def generate_chart(csv_file=None):
         lambda row: (
             (row["codegen_merged"] / row["codegen_total"] * 100)
             if row["codegen_total"] > 0
+            else 0
+        ),
+        axis=1,
+    )
+    df["cosine_percentage"] = df.apply(
+        lambda row: (
+            (row["cosine_merged"] / row["cosine_total"] * 100)
+            if row.get("cosine_total", 0) > 0
             else 0
         ),
         axis=1,
@@ -515,14 +532,19 @@ def export_chart_data_json(df):
         "cursor": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
         "devin": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
         "codegen": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
+        "cosine": {
+            "total": "#ffb3ff",   # light magenta (for total bars)
+            "merged": "#FF00FF",  # strong magenta (for merged bars)
+            "line": "#c800c8",    # darker magenta (for line)
+        },
     }
 
     # Add bar datasets for totals and merged PRs
-    for agent in ["copilot", "codex", "cursor", "devin", "codegen"]:
+    for agent in ["copilot", "codex", "cursor", "devin", "codegen", "cosine"]:
         # Process data to replace leading zeros with None (null in JSON)
-        total_data = df[f"{agent}_total"].tolist()
-        merged_data = df[f"{agent}_merged"].tolist()
-        percentage_data = df[f"{agent}_percentage"].tolist()
+        total_data = df.get(f"{agent}_total", pd.Series([0]*len(df))).tolist()
+        merged_data = df.get(f"{agent}_merged", pd.Series([0]*len(df))).tolist()
+        percentage_data = df.get(f"{agent}_percentage", pd.Series([0]*len(df))).tolist()
 
         # Find first non-zero total value index
         first_nonzero_idx = None
