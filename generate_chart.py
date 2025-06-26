@@ -532,7 +532,11 @@ def export_chart_data_json(df):
         "cursor": {"total": "#c4b5fd", "merged": "#7c3aed", "line": "#6d28d9"},
         "devin": {"total": "#86efac", "merged": "#059669", "line": "#047857"},
         "codegen": {"total": "#fed7aa", "merged": "#d97706", "line": "#b45309"},
-        "cosine": {"total": "#7dd3fc", "merged": "#0ea5e9", "line": "#0ea5e9"},
+        "cosine": {
+            "total": "#ffb3ff",   # light magenta (for total bars)
+            "merged": "#FF00FF",  # strong magenta (for merged bars)
+            "line": "#c800c8",    # darker magenta (for line)
+        },
     }
 
     # Add bar datasets for totals and merged PRs
