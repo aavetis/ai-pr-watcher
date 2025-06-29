@@ -1,6 +1,6 @@
 ### PR Analytics: Volume vs Success Rate (auto-updated)
 
-View the [interactive dashboard](https://aavetis.github.io/ai-pr-watcher/) for these statistics.
+View the [interactive dashboard](https://prarena.ai/) for these statistics.
 
 ## Understanding the Metrics
 
